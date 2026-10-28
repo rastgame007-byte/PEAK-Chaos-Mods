@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PEAK · Хаос-менеджер</title>
+<style>
+:root{
+  --bg:#0e1420; --bg2:#151d2e; --card:#1b2538; --card2:#223049; --line:#2e3d5c;
+  --txt:#eaf0fb; --mut:#8fa0c0; --acc:#ffb547; --acc2:#ff5d73; --ok:#4ade80; --blue:#5ab0ff;
+  --r:16px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body{min-height:100vh;background:
+  radial-gradient(900px 400px at 80% -10%,#2a3a6244,transparent),
+  radial-gradient(700px 400px at 0% 0%,#ff5d7314,transparent),var(--bg)}
+header{position:relative;padding:22px 18px 70px;overflow:hidden}
+header h1{margin:0;font-size:clamp(26px,5vw,40px);letter-spacing:.5px;font-weight:900}
+header h1 b{color:var(--acc)}
+header p{margin:6px 0 0;color:var(--mut);max-width:560px}
+header svg{position:absolute;right:0;bottom:0;width:min(520px,70%);height:auto;opacity:.9;pointer-events:none}
+.wrap{max-width:980px;margin:-40px auto 40px;padding:0 14px;position:relative}
+nav{display:flex;gap:6px;overflow-x:auto;padding:6px;background:var(--bg2);border:1px solid var(--line);border-radius:999px;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+nav button{flex:1 0 auto;border:0;background:transparent;color:var(--mut);font:600 14px inherit;font-family:inherit;padding:10px 16px;border-radius:999px;cursor:pointer;white-space:nowrap;transition:.15s}
+nav button:hover{color:var(--txt)}
+nav button.on{background:var(--acc);color:#241600}
+section{display:none;margin-top:16px;animation:fade .25s}
+section.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.card h2{margin:0 0 4px;font-size:18px}
+.sub{color:var(--mut);font-size:13px;margin:0 0 12px}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+button.btn{font-family:inherit;font-weight:700;font-size:14px;border:0;border-radius:12px;padding:11px 16px;cursor:pointer;background:var(--card2);color:var(--txt);transition:.12s}
+button.btn:hover{filter:brightness(1.2)}
+button.btn:active{transform:scale(.97)}
+button.pri{background:var(--acc);color:#241600}
+button.dan{background:var(--acc2);color:#fff}
+button.sm{padding:6px 10px;font-size:13px;border-radius:9px}
+input,select{font-family:inherit;font-size:14px;background:var(--bg2);color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:10px 12px;outline:none}
+input:focus,select:focus{border-color:var(--acc)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{display:flex;align-items:center;gap:8px;background:var(--card2);padding:6px 6px 6px 12px;border-radius:999px;font-weight:600;font-size:14px}
+.chip i{width:10px;height:10px;border-radius:50%;display:block}
+.chip button{border:0;background:#0003;color:var(--mut);width:22px;height:22px;border-radius:50%;cursor:pointer}
+.tabs2{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.tabs2 button{border:1px solid var(--line);background:transparent;color:var(--mut);padding:8px 12px;border-radius:10px;font:600 13px inherit;font-family:inherit;cursor:pointer}
+.tabs2 button.on{background:var(--card2);color:var(--acc);border-color:var(--acc)}
+/* wheel */
+.wheelbox{position:relative;width:min(100%,440px);margin:0 auto;aspect-ratio:1}
+.wheelbox canvas{width:100%;height:100%;display:block}
+.pointer{position:absolute;left:50%;top:-6px;transform:translateX(-50%);width:0;height:0;border-left:15px solid transparent;border-right:15px solid transparent;border-top:32px solid var(--acc2);filter:drop-shadow(0 3px 4px #0008);z-index:2}
+.hub{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:22%;aspect-ratio:1;border-radius:50%;border:0;background:var(--bg);color:var(--acc);font:900 15px inherit;font-family:inherit;cursor:pointer;box-shadow:0 0 0 5px var(--acc),0 6px 18px #000a;z-index:3}
+.hub:disabled{opacity:.7}
+.result{margin-top:14px;text-align:center;min-height:90px}
+.result .t{font-size:22px;font-weight:900;color:var(--acc)}
+.result .d{color:var(--txt);margin-top:6px;font-size:15px;line-height:1.45}
+.hist{margin:0;padding:0;list-style:none;display:grid;gap:6px;max-height:260px;overflow:auto}
+.hist li{background:var(--bg2);border-radius:10px;padding:8px 12px;font-size:13px;color:var(--mut)}
+.hist li b{color:var(--txt)}
+/* roles */
+.role{display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px}
+.role .n{font-weight:800;min-width:90px}
+.role .v{flex:1;color:var(--mut);font-size:14px;user-select:none}
+.role .v.show{color:var(--txt)}
+/* timer */
+.big{font-size:clamp(46px,12vw,84px);font-weight:900;text-align:center;font-variant-numeric:tabular-nums;color:var(--acc);margin:8px 0}
+.flash{position:fixed;inset:0;background:radial-gradient(circle,#ff5d73,#7a0f24);z-index:50;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;animation:pulse .5s infinite alternate}
+.flash.on{display:flex}
+.flash h3{margin:0;font-size:clamp(28px,7vw,56px);font-weight:900}
+.flash p{font-size:clamp(17px,3.4vw,26px);max-width:640px}
+@keyframes pulse{from{filter:brightness(.9)}to{filter:brightness(1.25)}}
+/* score */
+table{width:100%;border-collapse:collapse}
+th{font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.6px;text-align:center;padding:6px}
+th:first-child,td:first-child{text-align:left}
+td{padding:8px 4px;border-top:1px solid var(--line);text-align:center}
+td .cnt{display:inline-flex;align-items:center;gap:6px}
+td .cnt span{min-width:22px;font-weight:800;font-size:17px}
+td .cnt button{width:26px;height:26px;border-radius:8px;border:0;background:var(--card2);color:var(--txt);cursor:pointer;font-weight:800}
+.medal{display:inline-block;background:#ffb54722;color:var(--acc);border-radius:999px;padding:3px 10px;font-size:12px;font-weight:700;margin:2px 4px 2px 0}
+/* bingo */
+.bingo{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.bingo button{aspect-ratio:1;border:1px solid var(--line);background:var(--bg2);color:var(--txt);border-radius:12px;font:600 clamp(10px,2.3vw,13px)/1.2 inherit;font-family:inherit;padding:4px;cursor:pointer;transition:.12s}
+.bingo button.on{background:var(--ok);color:#052e12;border-color:var(--ok);font-weight:800}
+.bingo button.line{background:var(--acc);color:#241600;border-color:var(--acc)}
+.win{text-align:center;font-size:22px;font-weight:900;color:var(--acc);min-height:30px;margin-top:10px}
+code,.kbd{background:var(--bg2);border:1px solid var(--line);border-radius:7px;padding:2px 7px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;color:var(--acc)}
+.cmd{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:14px}
+.cmd span{color:var(--mut);text-align:right}
+.warn{background:#ff5d7318;border:1px solid #ff5d7355;border-radius:12px;padding:12px;font-size:13px;color:#ffc2cb;margin-top:12px}
+footer{text-align:center;color:var(--mut);font-size:12px;padding:20px}
+</style>
+</head>
+<body>
+<header>
+  <h1>⛰️ PEAK <b>Хаос-менеджер</b></h1>
+  <p>Рулетка челленджей, секретные роли, хаос-таймер и счётчик позора для вашего забега на вершину.</p>
+  <svg viewBox="0 0 520 170" fill="none" aria-hidden="true">
+    <path d="M0 170 L110 70 L160 110 L260 15 L350 100 L400 60 L520 170Z" fill="#1f2c48"/>
+    <path d="M260 15 L226 48 L246 44 L260 62 L276 42 L296 50Z" fill="#eaf0fb"/>
+    <path d="M0 170 L70 112 L130 150 L200 100 L300 170Z" fill="#17213a"/>
+    <circle cx="430" cy="34" r="16" fill="#ffb547" opacity=".85"/>
+  </svg>
+</header>
+
+<div class="wrap">
+  <div class="card" style="margin-bottom:14px">
+    <h2>🧗 Команда</h2>
+    <p class="sub">Добавь ники друзей — они используются во всех разделах. Всё сохраняется в браузере.</p>
+    <div class="row" style="margin-bottom:10px">
+      <input id="pname" placeholder="Ник скаута" maxlength="20" style="flex:1;min-width:140px">
+      <button class="btn pri" id="padd">Добавить</button>
+      <button class="btn" id="pdemo">Пример</button>
+    </div>
+    <div class="chips" id="chips"></div>
+  </div>
+
+  <nav id="nav">
+    <button data-t="wheel" class="on">🎡 Рулетка</button>
+    <button data-t="roles">🎭 Роли</button>
+    <button data-t="chaos">⏱️ Хаос-таймер</button>
+    <button data-t="score">💀 Позор</button>
+    <button data-t="bingo">🎯 Бинго</button>
+    <button data-t="cheats">🛠️ Читы</button>
+  </nav>
+
+  <!-- WHEEL -->
+  <section id="wheel" class="on">
+    <div class="grid g2">
+      <div class="card">
+        <div class="tabs2" id="wtabs"></div>
+        <div class="wheelbox">
+          <div class="pointer"></div>
+          <canvas id="wc" width="880" height="880"></canvas>
+          <button class="hub" id="spin">КРУТИ</button>
+        </div>
+        <div class="result" id="wres"><div class="d" style="color:var(--mut)">Выбери колесо и жми «КРУТИ»</div></div>
+      </div>
+      <div class="card">
+        <h2>📜 История</h2>
+        <p class="sub">Что уже выпало за эту сессию</p>
+        <ul class="hist" id="hist"></ul>
+        <div class="row" style="margin-top:12px"><button class="btn sm" id="hclear">Очистить</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ROLES -->
+  <section id="roles">
+    <div class="card">
+      <h2>🎭 Секретные роли</h2>
+      <p class="sub">Раздай роли случайно. Каждый смотрит свою — зажми «Показать» (лучше с глазу на глаз или в личке). Роли — это просто весёлые обязанности на забег.</p>
+      <div class="row" style="margin-bottom:12px">
+        <button class="btn pri" id="rdeal">🎲 Раздать роли</button>
+        <button class="btn" id="rhide">Скрыть все</button>
+      </div>
+      <div id="rlist"></div>
+    </div>
+  </section>
+
+  <!-- CHAOS -->
+  <section id="chaos">
+    <div class="card">
+      <h2>⏱️ Хаос-таймер</h2>
+      <p class="sub">Запусти и играй. В случайный момент между минимумом и максимумом экран взорвётся новым правилом для всех. Держи вкладку открытой и звук включённым.</p>
+      <div class="row" style="margin-bottom:6px">
+        <label>Мин <input type="number" id="cmin" value="3" min="1" max="60" style="width:70px"></label>
+        <label>Макс <input type="number" id="cmax" value="7" min="1" max="60" style="width:70px"></label>
+        <label class="row" style="gap:6px"><input type="checkbox" id="chide" checked style="width:auto"> Скрыть обратный отсчёт</label>
+      </div>
+      <div class="big" id="ctime">--:--</div>
+      <div class="row" style="justify-content:center">
+        <button class="btn pri" id="cstart">▶ Запустить</button>
+        <button class="btn" id="cnow">💥 Сейчас!</button>
+        <button class="btn dan" id="cstop">■ Стоп</button>
+      </div>
+      <p class="sub" id="cstat" style="text-align:center;margin-top:12px">Не запущен</p>
+    </div>
+  </section>
+
+  <!-- SCORE -->
+  <section id="score">
+    <div class="card">
+      <h2>💀 Счётчик позора</h2>
+      <p class="sub">Падения, смерти и спасения. Внизу — автоматические «звания».</p>
+      <div style="overflow-x:auto"><table id="stbl"></table></div>
+      <div id="medals" style="margin-top:14px"></div>
+      <div class="row" style="margin-top:12px"><button class="btn sm dan" id="sreset">Обнулить</button></div>
+    </div>
+  </section>
+
+  <!-- BINGO -->
+  <section id="bingo">
+    <div class="card">
+      <h2>🎯 Бинго PEAK</h2>
+      <p class="sub">Отмечай события по ходу забега. Собери линию — получи право назначить наказание остальным!</p>
+      <div class="bingo" id="bgrid"></div>
+      <div class="win" id="bwin"></div>
+      <div class="row" style="margin-top:10px;justify-content:center"><button class="btn" id="bnew">🔀 Новая карточка</button></div>
+    </div>
+  </section>
+
+  <!-- CHEATS -->
+  <section id="cheats">
+    <div class="grid g2">
+      <div class="card">
+        <h2>⌨️ Консоль (мод Console Unlocker)</h2>
+        <p class="sub">Консоль в игре открывается на <span class="kbd">F1</span> после установки BepInEx + Console Unlocker. Команды, о которых пишут авторы гайдов:</p>
+        <div id="cmds"></div>
+      </div>
+      <div class="card">
+        <h2>🧰 Свой чит-мод</h2>
+        <p class="sub">В папке <code>peak-fun-mod</code> лежит готовый плагин «PeakFun» с меню на <span class="kbd">F5</span>: бесконечная выносливость, скорость, полёт, и «приколы» над друзьями — подножка, катапульта, телепорт и режим хаоса.</p>
+        <p class="sub">Инструкция по установке — в <code>README.md</code> рядом с модом.</p>
+        <div class="warn">⚠️ Играйте так только по согласию всех участников лобби и в приватных играх с друзьями. Чит-моды могут сломаться после обновления игры.</div>
+      </div>
+    </div>
+  </section>
+</div>
+<footer>Сделано для веселья · Не аффилировано с Landfall / Aggro Crab</footer>
+
+<div class="flash" id="flash"><h3 id="ftitle"></h3><p id="ftext"></p><button class="btn" id="fok" style="margin-top:18px;font-size:18px;padding:14px 28px">Принято!</button></div>
+
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const COLORS=['#ff5d73','#ffb547','#4ade80','#5ab0ff','#c084fc','#f472b6','#2dd4bf','#fb923c'];
+const store={get:(k,d)=>{try{return JSON.parse(localStorage.getItem('peakfun.'+k))??d}catch{return d}},set:(k,v)=>{try{localStorage.setItem('peakfun.'+k,JSON.stringify(v))}catch{}}};
+let players=store.get('players',[]);       // [{name,color,falls,deaths,saves}]
+let roleMap=store.get('roles',{});
+let hist=store.get('hist',[]);
+const save=()=>{store.set('players',players);store.set('roles',roleMap);store.set('hist',hist)};
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ---------- DATA ---------- */
+const POOLS={
+ rules:{label:'📢 Правила для всех',items:[
+  ['Немые скауты','Никаких слов — только пинги, жесты и эмоции. Работает до ближайшего лагеря.'],
+  ['Шёпот','Говорим только шёпотом, даже когда падаем. Особенно когда падаем.'],
+  ['Одна верёвка','Никто не уходит дальше ~10 метров от остальных. Ушёл — все ждут и осуждают.'],
+  ['Пост','Есть самому нельзя. Еду можно только давать другому — кормите друг друга.'],
+  ['Пассажир','Один случайный игрок не трогает управление, его тащит команда (или он просто даёт «ценные советы»).'],
+  ['Гид-диктатор','Один ведёт и командует. Остальные идут строго по его пингам и спорить не вправе.'],
+  ['Патриот','Каждый прыжок сопровождается криком «ЗА РОДИНУ!»'],
+  ['Эстафета рюкзака','Каждые 2 минуты все отдают по одному предмету соседу справа.'],
+  ['Туман войны','Пинги запрещены. Объясняем путь только словами, без «ну вон там».'],
+  ['Одна рука','Играем, держа одну руку в кармане. Нечестно? Ничего, зато смешно.'],
+  ['Скромные герои','Прыжки «на удачу» запрещены. Каждый прыжок нужно озвучить заранее.'],
+  ['Сказочник','Все комментируют забег голосом диктора документального фильма.'],
+  ['Хор','Перед каждым сложным подъёмом вся команда считает вслух «три-два-один».'],
+  ['Левитация запрещена','Пока кто-то лезет, остальные стоят неподвижно и аплодируют эмоциями.']
+ ]},
+ punish:{label:'😈 Наказание упавшему',items:[
+  ['Танец','Пляши на месте 10 секунд, пока остальные смотрят.'],
+  ['Налог','Отдай другу свой лучший предмет.'],
+  ['Позорная история','Расскажи самую неловкую историю из жизни.'],
+  ['Третье лицо','Следующие 5 минут говори о себе в третьем лице.'],
+  ['Замыкающий','Следующую зону идёшь последним и без права на пинги.'],
+  ['Караоке','Спой куплет любой песни на выбор команды.'],
+  ['Пешеход','Следующие 3 минуты только ходьба — без бега и прыжков.'],
+  ['Грузчик','Несёшь самый тяжёлый предмет команды до следующего лагеря.'],
+  ['Гравитация — мой друг','Каждый раз, падая, кричишь «Я ЛЮБЛЮ ГРАВИТАЦИЮ».'],
+  ['Адвокат','Объясни, почему упал — максимально убедительно, как в суде.'],
+  ['Лидер-неудачник','Ты ведёшь команду следующие 2 минуты.'],
+  ['Подарок судьбы','Выбери друга — он назначает тебе наказание сам.']
+ ]},
+ gear:{label:'🎒 Проклятый предмет',items:[
+  ['Единственный','Нести нужно предмет, который никому не нравится. Бросить нельзя до лагеря.'],
+  ['Талисман','Весь забег носишь с собой самый бесполезный предмет и называешь его по имени.'],
+  ['Живой щит','Тот, кто несёт предмет, идёт первым.'],
+  ['Передача','Предмет передаётся по кругу каждый раз, когда кто-то падает.'],
+  ['Реликвия','Кто уронит предмет — пою гимн команде.'],
+  ['Контрабанда','Предмет нельзя показывать в пингах и обсуждать вслух.']
+ ]},
+ random:{label:'🎲 Хаос',items:[
+  ['Смена лидера','Лидером становится тот, кто сейчас идёт последним.'],
+  ['Минутa тишины','60 секунд никто не говорит. Нарушитель выбирает наказание у колеса.'],
+  ['Фотосессия','Все замирают и делают одинаковую эмоцию. Минуту не двигаться!'],
+  ['Лавовый пол','Нельзя стоять на месте дольше 5 секунд.'],
+  ['Обмен местами','Все по очереди меняются порядком в цепочке.'],
+  ['Пир','Все одновременно достают еду и едят. Кто успел — тот и герой.'],
+  ['Минута славы','Каждый по очереди называет худшее, что сделал на этой горе.'],
+  ['Кинотеатр','Следующие 2 минуты комментируем друг друга, как футбольных игроков.']
+ ]}
+};
+const ROLES=[
+ ['😈 Саботажник','Тайно мешаешь команде, но аккуратно: цель — чтобы тебя раскрыли не раньше следующего лагеря.'],
+ ['😇 Ангел-хранитель','Ты первым бросаешься спасать любого упавшего. Любой ценой.'],
+ ['😱 Паникёр','Кричишь «МЫ ВСЕ УМРЁМ!» перед каждым подъёмом.'],
+ ['🧭 Гид','Ведёшь маршрут и уверенно ошибаешься. Признавать ошибки нельзя.'],
+ ['🦝 Жадина','Подбираешь всё, что видишь. Делиться только под давлением.'],
+ ['🧙 Философ','Каждое действие комментируешь «мудрой мыслью».'],
+ ['🎙️ Комментатор','Комментируешь всё, как спортивный диктор.'],
+ ['🍎 Нянька','Следишь, чтобы у всех была еда. Заботливо ворчишь.'],
+ ['🤡 Шут','Каждые пару минут обязан выдать шутку. Не смешную — штраф.'],
+ ['🕵️ Скептик','Не веришь маршруту команды и предлагаешь «свой» (но не самоубийственный).'],
+ ['🥷 Тихоня','Говоришь только шёпотом. Если громко — тебя уже слышат все.'],
+ ['🎭 Актёр','Любое падение изображаешь с максимальным драматизмом.']
+];
+const CHAOS=[
+ ['ТИШИНА!','60 секунд никто не говорит ни слова.'],
+ ['СМЕНА ЛИДЕРА','Теперь ведёт тот, кто идёт последним.'],
+ ['ОБМЕН!','Все отдают один предмет соседу справа.'],
+ ['ФОТОСЕССИЯ','Замрите и сделайте одинаковую эмоцию на 10 секунд.'],
+ ['ЛАВОВЫЙ ПОЛ','Следующую минуту нельзя стоять на месте дольше 5 секунд.'],
+ ['ПИР','Все достают еду и едят одновременно.'],
+ ['ШЁПОТ','Две минуты говорим только шёпотом.'],
+ ['ЗА РОДИНУ!','Каждый прыжок следующие 2 минуты — с криком «ЗА РОДИНУ!»'],
+ ['ДВИЖ-ТАНЕЦ','Все танцуют 10 секунд. Кто не танцует — штраф.'],
+ ['СЛЕПОЙ ГИД','Один игрок закрывает глаза или не смотрит на экран — остальные ведут голосом.'],
+ ['ПРИЗНАНИЕ','Каждый называет своё самое глупое падение сегодня.'],
+ ['ЗАМОРОЗКА','Следующие 30 секунд все идут только шагом.']
+];
+const BINGO=['Кто-то упал с большой высоты','Съели ядовитую ягоду','Крик в войс-чате','Спасли друга','«Давай я первый» → упал','Кто-то потерял рюкзак','Замёрзли','Нашли Bing Bong','Спор о маршруте','«Это последний прыжок»','Упали все сразу','Кто-то афк','Прыжок «на удачу»','Тишина 30+ секунд','Кто-то застрял','Верёвка спасла','Смех до слёз','Кого-то уронил друг','Кто-то съел не то','Забыли еду','Кто-то отстал','«Я знаю короткий путь»','Нечаянный полёт','Минус выносливость в самый неудачный момент','Кто-то кричит «НЕ СМОТРИ ВНИЗ»','Минута в лагере — и всё сначала'];
+const CMDS=[
+ ['Character.InfiniteStamina','бесконечная выносливость'],
+ ['Character.GainFullStamina','восстановить выносливость'],
+ ['Character.LockStatuses','заморозить статусы (голод, холод…)'],
+ ['Character.PassOut','упасть в обморок'],
+ ['Character.Revive','воскреснуть'],
+ ['Character.Die','умереть (красиво)'],
+ ['Item.Add <имя>','добавить предмет в инвентарь'],
+ ['Item.RemoveAll','убрать все предметы'],
+ ['Afflictions.AddCurse / AddPoison','проклятие / яд на себя'],
+ ['Afflictions.Clear','снять все негативные эффекты']
+];
+
+/* ---------- NAV ---------- */
+$$('#nav button').forEach(b=>b.onclick=()=>{
+  $$('#nav button').forEach(x=>x.classList.toggle('on',x===b));
+  $$('section').forEach(s=>s.classList.toggle('on',s.id===b.dataset.t));
+  if(b.dataset.t==='wheel') drawWheel();
+});
+
+/* ---------- PLAYERS ---------- */
+function renderPlayers(){
+  $('#chips').innerHTML=players.length?players.map((p,i)=>`<div class="chip"><i style="background:${p.color}"></i>${esc(p.name)}<button data-i="${i}" title="Убрать">✕</button></div>`).join(''):'<span class="sub" style="margin:0">Пока никого. Добавь друзей ↑</span>';
+  $$('#chips button').forEach(b=>b.onclick=()=>{players.splice(+b.dataset.i,1);save();refreshAll()});
+}
+function addPlayer(n){n=n.trim();if(!n)return;players.push({name:n,color:COLORS[players.length%COLORS.length],falls:0,deaths:0,saves:0});save();refreshAll()}
+$('#padd').onclick=()=>{addPlayer($('#pname').value);$('#pname').value='';$('#pname').focus()};
+$('#pname').onkeydown=e=>{if(e.key==='Enter')$('#padd').click()};
+$('#pdemo').onclick=()=>{players=[];['Скаут','Альпинист','Новичок','Профи'].forEach(addPlayer)};
+
+/* ---------- WHEEL ---------- */
+let curPool='rules', theta=0, spinning=false, segs=[];
+function buildTabs(){
+  const keys=[...Object.keys(POOLS),'who'];
+  $('#wtabs').innerHTML=keys.map(k=>`<button data-k="${k}" class="${k===curPool?'on':''}">${k==='who'?'🎯 Кто виноват?':POOLS[k].label}</button>`).join('');
+  $$('#wtabs button').forEach(b=>b.onclick=()=>{if(spinning)return;curPool=b.dataset.k;buildTabs();buildSegs();drawWheel();$('#wres').innerHTML='<div class="d" style="color:var(--mut)">Жми «КРУТИ»</div>'});
+}
+function buildSegs(){
+  if(curPool==='who'){
+    segs=players.length?players.map((p,i)=>({t:p.name,d:'Виноват(а) — '+p.name+'! Делай вывод.',c:p.color})):[];
+  }else{
+    const it=shuffle(POOLS[curPool].items).slice(0,10);
+    segs=it.map((x,i)=>({t:x[0],d:x[1],c:null}));
+  }
+  segs.forEach((s,i)=>{if(!s.c)s.c=`hsl(${(i*360/segs.length+20)%360} 65% 52%)`});
+}
+function drawWheel(){
+  const c=$('#wc'),x=c.getContext('2d'),W=c.width,R=W/2-8;
+  x.clearRect(0,0,W,W);
+  if(!segs.length){x.fillStyle='#223049';x.beginPath();x.arc(W/2,W/2,R,0,7);x.fill();x.fillStyle='#8fa0c0';x.font='700 38px system-ui';x.textAlign='center';x.fillText('Добавь игроков',W/2,W/2-60);return}
+  const n=segs.length,a=Math.PI*2/n;
+  x.save();x.translate(W/2,W/2);x.rotate(theta);
+  segs.forEach((s,i)=>{
+    x.beginPath();x.moveTo(0,0);x.arc(0,0,R,i*a,(i+1)*a);x.closePath();
+    x.fillStyle=s.c;x.fill();x.lineWidth=4;x.strokeStyle='#0e1420';x.stroke();
+    x.save();x.rotate(i*a+a/2);x.textAlign='right';x.fillStyle='#10141f';
+    let fs=n>8?34:40;x.font=`800 ${fs}px system-ui`;
+    let t=s.t;while(x.measureText(t).width>R*.62&&t.length>3)t=t.slice(0,-2);if(t!==s.t)t+='…';
+    x.fillText(t,R-26,fs/3);x.restore();
+  });
+  x.restore();
+  x.beginPath();x.arc(W/2,W/2,R,0,7);x.lineWidth=10;x.strokeStyle='#ffb547';x.stroke();
+}
+function beep(f=660,d=.12,t='sine',v=.15){try{const A=window._ac||(window._ac=new (window.AudioContext||window.webkitAudioContext)());const o=A.createOscillator(),g=A.createGain();o.type=t;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(A.destination);o.start();g.gain.exponentialRampToValueAtTime(.001,A.currentTime+d);o.stop(A.currentTime+d)}catch{}}
+$('#spin').onclick=()=>{
+  if(spinning||!segs.length)return;
+  spinning=true;$('#spin').disabled=true;
+  const n=segs.length,a=Math.PI*2/n,win=Math.floor(Math.random()*n);
+  const jitter=(Math.random()*.7-.35)*a;
+  let target=1.5*Math.PI-(win+.5)*a+jitter;
+  const base=theta-(theta%(Math.PI*2));
+  target+=base+Math.PI*2*(6+Math.floor(Math.random()*3));
+  while(target<theta+Math.PI*8)target+=Math.PI*2;
+  const start=theta,dur=5200,t0=performance.now();let lastSeg=-1;
+  (function f(now){
+    const p=Math.min(1,(now-t0)/dur),e=1-Math.pow(1-p,4);
+    theta=start+(target-start)*e;drawWheel();
+    const idx=Math.floor((((1.5*Math.PI-theta)%(Math.PI*2))+Math.PI*2)%(Math.PI*2)/a);
+    if(idx!==lastSeg){lastSeg=idx;beep(500+idx*30,.04,'square',.04)}
+    if(p<1)requestAnimationFrame(f);else{
+      spinning=false;$('#spin').disabled=false;theta%=Math.PI*2;
+      const s=segs[win];beep(880,.25,'triangle',.2);setTimeout(()=>beep(1175,.3,'triangle',.2),130);
+      $('#wres').innerHTML=`<div class="t">${esc(s.t)}</div><div class="d">${esc(s.d)}</div>`;
+      hist.unshift({k:curPool==='who'?'Кто виноват':POOLS[curPool].label,t:s.t,time:new Date().toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'})});
+      hist=hist.slice(0,40);save();renderHist();
+    }
+  })(t0);
+};
+function renderHist(){$('#hist').innerHTML=hist.length?hist.map(h=>`<li><b>${esc(h.t)}</b> · ${esc(h.k)} · ${h.time}</li>`).join(''):'<li>Пока пусто</li>'}
+$('#hclear').onclick=()=>{hist=[];save();renderHist()};
+
+/* ---------- ROLES ---------- */
+function renderRoles(){
+  if(!players.length){$('#rlist').innerHTML='<p class="sub">Сначала добавь игроков.</p>';return}
+  $('#rlist').innerHTML=players.map((p,i)=>{
+    const r=roleMap[p.name];
+    return `<div class="role"><div class="n" style="color:${p.color}">${esc(p.name)}</div>
+      <div class="v" id="rv${i}">${r?'🔒 роль скрыта':'— роль не выдана —'}</div>
+      ${r?`<button class="btn sm" data-i="${i}">Показать (зажми)</button>`:''}</div>`}).join('');
+  $$('#rlist button').forEach(b=>{
+    const i=+b.dataset.i,v=$('#rv'+i),r=roleMap[players[i].name];
+    const show=()=>{v.classList.add('show');v.innerHTML=`<b>${esc(r[0])}</b> — ${esc(r[1])}`};
+    const hide=()=>{v.classList.remove('show');v.textContent='🔒 роль скрыта'};
+    b.onpointerdown=show;b.onpointerup=b.onpointerleave=b.onpointercancel=hide;
+  });
+}
+$('#rdeal').onclick=()=>{const rs=shuffle(ROLES);roleMap={};players.forEach((p,i)=>roleMap[p.name]=rs[i%rs.length]);save();renderRoles()};
+$('#rhide').onclick=renderRoles;
+
+/* ---------- CHAOS TIMER ---------- */
+let ctimer=null,cleft=0,cdeadline=0,cused=[];
+const fmt=s=>{s=Math.max(0,Math.round(s));return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')};
+function schedule(){
+  let mn=Math.max(1,+$('#cmin').value||3),mx=Math.max(mn,+$('#cmax').value||7);
+  cleft=(mn+Math.random()*(mx-mn))*60;cdeadline=Date.now()+cleft*1000;
+}
+function tick(){
+  const left=(cdeadline-Date.now())/1000;
+  $('#ctime').textContent=$('#chide').checked?'🤫 ??:??':fmt(left);
+  if(left<=0){fire();schedule()}
+}
+function fire(ev){
+  if(!ev){if(cused.length>=CHAOS.length)cused=[];ev=pick(CHAOS.filter(x=>!cused.includes(x)));cused.push(ev)}
+  $('#ftitle').textContent='💥 '+ev[0];$('#ftext').textContent=ev[1];$('#flash').classList.add('on');
+  [0,180,360].forEach((d,i)=>setTimeout(()=>beep([440,660,880][i],.2,'sawtooth',.2),d));
+  if(navigator.vibrate)navigator.vibrate([200,100,200]);
+  hist.unshift({k:'Хаос-таймер',t:ev[0],time:new Date().toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'})});save();renderHist();
+}
+$('#fok').onclick=()=>$('#flash').classList.remove('on');
+$('#cstart').onclick=()=>{clearInterval(ctimer);schedule();ctimer=setInterval(tick,500);tick();$('#cstat').textContent='Идёт отсчёт… готовьтесь ко всему.';beep(520,.1)};
+$('#cstop').onclick=()=>{clearInterval(ctimer);ctimer=null;$('#ctime').textContent='--:--';$('#cstat').textContent='Остановлен'};
+$('#cnow').onclick=()=>fire();
+
+/* ---------- SCORE ---------- */
+function renderScore(){
+  if(!players.length){$('#stbl').innerHTML='<tr><td>Добавь игроков.</td></tr>';$('#medals').innerHTML='';return}
+  const cell=(i,k)=>`<div class="cnt"><button data-i="${i}" data-k="${k}" data-d="-1">−</button><span>${players[i][k]}</span><button data-i="${i}" data-k="${k}" data-d="1">+</button></div>`;
+  $('#stbl').innerHTML='<tr><th>Скаут</th><th>Падения</th><th>Смерти</th><th>Спасения</th></tr>'+players.map((p,i)=>`<tr><td style="color:${p.color};font-weight:800">${esc(p.name)}</td><td>${cell(i,'falls')}</td><td>${cell(i,'deaths')}</td><td>${cell(i,'saves')}</td></tr>`).join('');
+  $$('#stbl button').forEach(b=>b.onclick=()=>{const p=players[+b.dataset.i];p[b.dataset.k]=Math.max(0,p[b.dataset.k]+ +b.dataset.d);save();renderScore()});
+  const top=(k)=>{const m=Math.max(...players.map(p=>p[k]));return m>0?players.filter(p=>p[k]===m).map(p=>p.name).join(', '):null};
+  const M=[['🧲 Гравитационный магнит',top('falls')],['☠️ Любитель респавна',top('deaths')],['😇 Ангел-хранитель',top('saves')]].filter(x=>x[1]);
+  $('#medals').innerHTML=M.length?M.map(m=>`<span class="medal">${m[0]}: ${esc(m[1])}</span>`).join(''):'<span class="sub">Звания появятся, когда кто-нибудь упадёт :)</span>';
+}
+$('#sreset').onclick=()=>{if(confirm('Обнулить счётчики?')){players.forEach(p=>p.falls=p.deaths=p.saves=0);save();renderScore()}};
+
+/* ---------- BINGO ---------- */
+let card=store.get('bingo',null);
+function newCard(){const it=shuffle(BINGO).slice(0,24);it.splice(12,0,'⭐ СВОБОДНО');card={items:it,on:Array(25).fill(false)};card.on[12]=true;store.set('bingo',card);renderBingo()}
+function lines(){const L=[];for(let i=0;i<5;i++){L.push([0,1,2,3,4].map(j=>i*5+j));L.push([0,1,2,3,4].map(j=>j*5+i))}L.push([0,6,12,18,24],[4,8,12,16,20]);return L.filter(l=>l.every(i=>card.on[i]))}
+function renderBingo(){
+  if(!card)return newCard();
+  const ls=lines(),hl=new Set(ls.flat());
+  $('#bgrid').innerHTML=card.items.map((t,i)=>`<button data-i="${i}" class="${card.on[i]?'on':''} ${hl.has(i)?'line':''}">${esc(t)}</button>`).join('');
+  $$('#bgrid button').forEach(b=>b.onclick=()=>{const i=+b.dataset.i;if(i===12)return;card.on[i]=!card.on[i];store.set('bingo',card);const had=lines().length;renderBingo();if(lines().length>had){beep(880,.2,'triangle');setTimeout(()=>beep(1320,.3,'triangle'),120)}});
+  $('#bwin').textContent=ls.length?`🎉 БИНГО! Линий: ${ls.length}. Назначай наказание!`:'';
+}
+$('#bnew').onclick=newCard;
+
+/* ---------- CHEATS ---------- */
+$('#cmds').innerHTML=CMDS.map(c=>`<div class="cmd"><code>${esc(c[0])}</code><span>${esc(c[1])}</span></div>`).join('');
+
+/* ---------- INIT ---------- */
+function refreshAll(){renderPlayers();renderRoles();renderScore();buildSegs();drawWheel()}
+buildTabs();renderHist();renderBingo();refreshAll();
+</script>
+</body>
+</html>
