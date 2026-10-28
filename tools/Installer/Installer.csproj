@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <AssemblyName>PEAK-Mods-Installer</AssemblyName>
+    <RootNamespace>PeakInstaller</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <UseWindowsForms>true</UseWindowsForms>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <Version>1.0.0</Version>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <Product>PEAK Mods Installer</Product>
+    <Company>rastgame007-byte</Company>
+    <Description>Установщик модов PeakFun, PeakMods и PeakJujutsu для PEAK</Description>
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System.IO.Compression" />
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+    <EmbeddedResource Include="payload\PeakFun.zip" LogicalName="payload.PeakFun.zip" />
+    <EmbeddedResource Include="payload\PeakMods.zip" LogicalName="payload.PeakMods.zip" />
+    <EmbeddedResource Include="payload\PeakJujutsu.zip" LogicalName="payload.PeakJujutsu.zip" />
+  </ItemGroup>
+</Project>

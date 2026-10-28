@@ -8,37 +8,44 @@
 
 | Мод | Версия | Для чего | Папка | Скачать |
 |---|---|---|---|---|
-| **PeakFun** | 1.32.0 | Главный мод: способности героев, баскетбол, мини-игры, пранки, режим **BACKROOMS: PEAK** (17 уровней, монстры, ловушки), темы, бот-спутник | [`mods/PeakFun`](mods/PeakFun) | [`downloads/PeakFun-1.32.0.zip`](downloads/PeakFun-1.32.0.zip) |
-| **PeakMods** | 1.0.0 | Прохождение с модификаторами (правила легче/сложнее/веселее). Без читов | [`mods/PeakMods`](mods/PeakMods) | [`downloads/PeakMods-1.0.0.zip`](downloads/PeakMods-1.0.0.zip) |
-| **PeakJujutsu** | 1.0.1 | «Магическая битва» для одиночной игры: 6 персонажей, техники, расширения территорий, охота на проклятия с боссами | [`mods/PeakJujutsu`](mods/PeakJujutsu) | [`downloads/PeakJujutsu-1.0.1.zip`](downloads/PeakJujutsu-1.0.1.zip) |
+| **PeakFun** | 1.32.0 | Главный мод: способности героев, баскетбол, мини-игры, пранки, режим **BACKROOMS: PEAK** (17 уровней, монстры, ловушки), темы, бот-спутник | [`mods/PeakFun`](mods/PeakFun) | [`Install-PeakFun.exe`](mods/PeakFun/Install-PeakFun.exe), [zip](downloads/PeakFun-1.32.0.zip) |
+| **PeakMods** | 1.0.0 | Прохождение с модификаторами (правила легче/сложнее/веселее). Без читов | [`mods/PeakMods`](mods/PeakMods) | [`Install-PeakMods.exe`](mods/PeakMods/Install-PeakMods.exe), [zip](downloads/PeakMods-1.0.0.zip) |
+| **PeakJujutsu** | 1.0.1 | «Магическая битва» для одиночной игры: 6 персонажей, техники, расширения территорий, охота на проклятия с боссами | [`mods/PeakJujutsu`](mods/PeakJujutsu) | [`Install-PeakJujutsu.exe`](mods/PeakJujutsu/Install-PeakJujutsu.exe), [zip](downloads/PeakJujutsu-1.0.1.zip) |
 | **Хаос-менеджер** | — | Веб-приложение: рулетка челленджей, роли, таймер, счётчик позора, бинго | [`web/ChaosManager`](web/ChaosManager) | открыть `index.html` в браузере |
 
-## Установка
+## Установка (самый простой способ — установщик)
 
-1. Скачай нужный `.zip` из папки `downloads/` и **распакуй** его.
-2. Следуй `INSTALL_RU.txt` внутри (обычно: запусти `INSTALL.bat` или скопируй содержимое папки `1_COPY_INTO_GAME_FOLDER` в папку игры).
-3. Моды можно ставить вместе, но у **всех друзей** должен стоять один и тот же набор (PeakFun синхронизируется по сети).
+1. Скачай **[PEAK-Mods-Installer.exe](PEAK-Mods-Installer.exe)** (кнопка «Download raw file» на странице файла или со страницы [Releases](../../releases)).
+2. Закрой PEAK и запусти установщик. Он сам найдёт папку игры в Steam (если не найдёт — нажми «Обзор…»).
+3. Отметь нужные моды и нажми **«УСТАНОВИТЬ ВЫБРАННЫЕ»**. BepInEx установится автоматически вместе с модами. Там же есть кнопки удаления.
 
-Откат: `UNINSTALL.bat` (или удалить файлы мода из `BepInEx/plugins`).
+Установщик собран под Windows 10/11 и работает без установки .NET. Если Windows SmartScreen пишет «Неизвестный издатель» — это потому, что файл не имеет платной подписи: «Подробнее → Выполнить в любом случае». Проверить исходники установщика можно в `tools/Installer`.
+
+Моды можно ставить вместе, но у **всех друзей** должен стоять один и тот же набор (PeakFun синхронизируется по сети). Клавиша F4 занята и в PeakFun, и в PeakJujutsu — если они вместе, F4 может мешать.
+
+### Вручную (без exe)
+
+В папке каждого мода лежат готовые файлы игры `1_COPY_INTO_GAME_FOLDER` (BepInEx, `winhttp.dll`, `doorstop_config.ini` и сам мод в `BepInEx/plugins`), `INSTALL.bat`/`UNINSTALL.bat` и `INSTALL_RU.txt`. Либо скопируй содержимое `1_COPY_INTO_GAME_FOLDER` в папку PEAK, либо запусти `INSTALL.bat`. Откат — `UNINSTALL.bat`. Архивы тех же файлов лежат в `downloads/`.
 
 ## Структура репозитория
 
 ```
 PEAK-Chaos-Mods/
+├── PEAK-Mods-Installer.exe   установщик всех модов (авто-поиск игры, BepInEx, удаление)
 ├── README.md
 ├── LICENSE
-├── downloads/            готовые сборки (.zip) со всем нужным для установки
+├── downloads/                готовые сборки (.zip)
 ├── mods/
-│   ├── PeakFun/          исходники (src/) + описание
-│   ├── PeakMods/
-│   └── PeakJujutsu/
-└── web/
-    └── ChaosManager/     веб-приложение (index.html)
+│   ├── PeakFun/              Install-PeakFun.exe, 1_COPY_INTO_GAME_FOLDER/ (BepInEx + мод), INSTALL.bat, src/
+│   ├── PeakMods/             то же для PeakMods
+│   └── PeakJujutsu/          то же для PeakJujutsu
+├── tools/Installer/          исходники установщика (C#, WinForms)
+└── web/ChaosManager/         веб-приложение (index.html)
 ```
 
 ## Сборка из исходников
 
-В каждой папке мода: положи `BepInEx.dll` и `0Harmony.dll` (из BepInEx 5) в `libs/`, затем `cd src && dotnet build -c Release`. Нужен .NET SDK; DLL игры не требуются.
+В каждой папке мода (исходники в `src/`): положи `BepInEx.dll` и `0Harmony.dll` (из BepInEx 5) в `libs/`, затем `cd src && dotnet build -c Release`. Нужен .NET SDK; DLL игры не требуются.
 
 В архивы `downloads/` входит BepInEx (LGPL-2.1, [github.com/BepInEx/BepInEx](https://github.com/BepInEx/BepInEx)).
 
