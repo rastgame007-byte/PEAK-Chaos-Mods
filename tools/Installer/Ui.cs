@@ -40,7 +40,7 @@ namespace PeakInstaller
             Text = "PEAK Mods — установщик";
             Font = new Font("Segoe UI", 9.5f);
             BackColor = Bg; ForeColor = Fg;
-            ClientSize = new Size(660, 700);
+            ClientSize = new Size(660, 780);
             FormBorderStyle = FormBorderStyle.FixedSingle; MaximizeBox = false;
             StartPosition = FormStartPosition.CenterScreen;
             try { Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath); } catch { }
@@ -179,13 +179,18 @@ namespace PeakInstaller
             var g = GameDir(); var sel = Selected();
             if (!Logic.IsGame(g)) return;
             if (sel.Count == 0) { MessageBox.Show(this, "Отметь хотя бы один мод.", "Нечего ставить", MessageBoxButtons.OK, MessageBoxIcon.Information); return; }
+            if (sel.Any(m => m.Id == "PeakBackrooms") && (sel.Any(m => m.Id == "PeakFun") || Logic.ModInstalled(g, "PeakFun.dll")))
+            {
+                if (MessageBox.Show(this, "PeakBackrooms и PeakFun вместе ставить нельзя: Backrooms уже встроены в PeakFun (вкладка «Backrooms ×16»), два одинаковых мода конфликтуют.\n\nВсё равно установить?",
+                    "Конфликт модов", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
+            }
             if (!CheckRunning()) return;
             SetBusy(true);
             try
             {
                 int n = await Task.Run(() => Logic.Install(g, sel, Payload, Say));
                 Say("Готово: скопировано файлов — " + n + ".");
-                Say("Запусти PEAK. Меню модов: PeakFun — F5, PeakMods — F1, PeakJujutsu — F4.");
+                Say("Запусти PEAK. Меню модов: PeakFun — F5, PeakMods — F1, PeakJujutsu — F4, PeakBackrooms — Home.");
                 if (sel.Any(m => m.Id == "PeakFun") && sel.Any(m => m.Id == "PeakJujutsu")) Say("Внимание: клавиша F4 занята у обоих модов (в PeakFun — «играть за друга»). Если мешает — ставь их по отдельности.");
                 MessageBox.Show(this, "Установка завершена!\n\nМоды: " + string.Join(", ", sel.Select(m => m.Id)) + "\nЗапусти PEAK через Steam.\n\nПервый запуск с BepInEx может идти дольше обычного.",
                     "Готово", MessageBoxButtons.OK, MessageBoxIcon.Information);

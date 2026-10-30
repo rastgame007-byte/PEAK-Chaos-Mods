@@ -1,0 +1,22 @@
+PeakBackrooms 2.0.0 для PEAK — установка
+=========================================
+
+Самый простой способ: установщик PEAK-Mods-Installer.exe (github.com/rastgame007-byte/PEAK-Chaos-Mods) —
+отметь PeakBackrooms и нажми «Установить». Либо вручную:
+
+1. Закрой игру.
+2. Распакуй архив (сначала «Извлечь всё», не запускай из окна архива).
+3. Запусти INSTALL.bat (сам найдёт папку игры в Steam) ИЛИ скопируй всё содержимое папки
+   1_COPY_INTO_GAME_FOLDER в папку PEAK рядом с PEAK.exe (winhttp.dll, doorstop_config.ini, папка BepInEx).
+4. Запусти игру. Нажми Home -> вкладка «Вход» -> «ВОЙТИ В BACKROOMS — ВСЕМ ОТРЯДОМ».
+
+ВАЖНО:
+ - Мод должен стоять у ВСЕХ друзей в лобби.
+ - Не ставь вместе с PeakFun: Backrooms уже входят в PeakFun (вкладка «Backrooms ×16»), и два одинаковых мода конфликтуют.
+ - F — фонарик, End — аварийный выход для себя, Home — меню.
+ - Настройки: BepInEx\config\com.friends.peakbackrooms.cfg (размер карт, сложность, стартовый уровень, кнопки).
+ - Если не работает — пришли BepInEx\LogOutput.log и отчёт из вкладки «Проверка».
+
+Удалить: UNINSTALL.bat (или убрать PeakBackrooms.dll из BepInEx\plugins).
+Если уже стоит BepInEx 5 — достаточно положить PeakBackrooms.dll в BepInEx\plugins.
+Linux/Steam Deck: в параметрах запуска Steam впиши  WINEDLLOVERRIDES="winhttp=n,b" %command%

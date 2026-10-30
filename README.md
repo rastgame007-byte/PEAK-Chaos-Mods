@@ -10,6 +10,7 @@
 |---|---|---|---|---|
 | **PeakFun** | 1.32.0 | Главный мод: способности героев, баскетбол, мини-игры, пранки, режим **BACKROOMS: PEAK** (17 уровней, монстры, ловушки), темы, бот-спутник | [`mods/PeakFun`](mods/PeakFun) | [`Install-PeakFun.exe`](mods/PeakFun/Install-PeakFun.exe), [zip](downloads/PeakFun-1.32.0.zip) |
 | **PeakMods** | 1.0.0 | Прохождение с модификаторами (правила легче/сложнее/веселее). Без читов | [`mods/PeakMods`](mods/PeakMods) | [`Install-PeakMods.exe`](mods/PeakMods/Install-PeakMods.exe), [zip](downloads/PeakMods-1.0.0.zip) |
+| **PeakBackrooms** | 2.0.0 | **Отдельный мод про Backrooms**: 17 уровней, монстры по вики, ловушки, лут, вход всем отрядом (Home). Без читов и пранков. Не ставить вместе с PeakFun | [`mods/PeakBackrooms`](mods/PeakBackrooms) | [`Install-PeakBackrooms.exe`](mods/PeakBackrooms/Install-PeakBackrooms.exe), [zip](downloads/PeakBackrooms-2.0.0.zip) |
 | **PeakJujutsu** | 1.0.1 | «Магическая битва» для одиночной игры: 6 персонажей, техники, расширения территорий, охота на проклятия с боссами | [`mods/PeakJujutsu`](mods/PeakJujutsu) | [`Install-PeakJujutsu.exe`](mods/PeakJujutsu/Install-PeakJujutsu.exe), [zip](downloads/PeakJujutsu-1.0.1.zip) |
 | **Хаос-менеджер** | — | Веб-приложение: рулетка челленджей, роли, таймер, счётчик позора, бинго | [`web/ChaosManager`](web/ChaosManager) | открыть `index.html` в браузере |
 
@@ -34,10 +35,11 @@ PEAK-Chaos-Mods/
 ├── PEAK-Mods-Installer.exe   установщик всех модов (авто-поиск игры, BepInEx, удаление)
 ├── README.md
 ├── LICENSE
-├── downloads/                готовые сборки (.zip)
+├── downloads/                готовые сборки (.zip), в т.ч. тестовая PeakFun DEV
 ├── mods/
 │   ├── PeakFun/              Install-PeakFun.exe, 1_COPY_INTO_GAME_FOLDER/ (BepInEx + мод), INSTALL.bat, src/
 │   ├── PeakMods/             то же для PeakMods
+│   ├── PeakBackrooms/        отдельный мод Backrooms (то же самое)
 │   └── PeakJujutsu/          то же для PeakJujutsu
 ├── tools/Installer/          исходники установщика (C#, WinForms)
 └── web/ChaosManager/         веб-приложение (index.html)
